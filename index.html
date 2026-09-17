@@ -1,15 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="./support.js"></script>
+<title>Setembro Amarelo · WAP</title>
+<meta name="description" content="Campanha Setembro Amarelo da WAP: escolha uma mensagem de cuidado, compartilhe e conheça boas práticas de bem-estar.">
+<script>
+// As artes decorativas de assets/*.png ainda não estão no repositório.
+// Enquanto faltarem, esconde a imagem quebrada em vez de mostrar o ícone
+// de erro do navegador. Assim que os PNGs forem commitados isso nunca dispara.
+addEventListener("error", function (e) {
+  var el = e.target;
+  if (!el || el.tagName !== "IMG" || el.dataset.saMissing) return;
+  el.dataset.saMissing = "1";
+  el.style.visibility = "hidden";
+}, true);
+</script>
 </head>
 <body>
 <x-dc>
 <helmet data-dc-atomics="">
 <style>
-@font-face{font-family:"InterW";src:url("assets/Inter-Light.ttf") format("truetype");font-weight:300;font-display:swap}
 @font-face{font-family:"InterW";src:url("assets/Inter-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
 @font-face{font-family:"InterW";src:url("assets/Inter-Medium.ttf") format("truetype");font-weight:500;font-display:swap}
 @font-face{font-family:"InterW";src:url("assets/Inter-SemiBold.ttf") format("truetype");font-weight:600;font-display:swap}
