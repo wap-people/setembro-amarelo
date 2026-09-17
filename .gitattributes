@@ -1,0 +1,10 @@
+# Deixa o git em paz com os binarios: qualquer normalizacao de fim de linha
+# corrompe fonte e imagem.
+*.woff2 binary
+*.ttf   binary
+*.webp  binary
+*.png   binary
+*.pdf   binary
+
+# vendor/ e copia verificada contra o SRI do support.js — nao normalizar.
+vendor/** -text

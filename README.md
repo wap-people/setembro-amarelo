@@ -18,17 +18,57 @@ em ~1 minuto.
 
 ## Estrutura
 
-| Arquivo | Para que serve |
+| Caminho | Para que serve |
 | --- | --- |
 | `index.html` | A página. Template (`<x-dc>`) + lógica (`class Component extends DCLogic`). |
-| `support.js` | Runtime do protótipo (dc-runtime). Compila o template e monta o componente; carrega React 18 do unpkg. **Sem ele a página fica em branco.** |
-| `assets/Inter-*.ttf` | Fonte Inter (300/400/500/600), usada com o nome `InterW`. |
-| `assets/*.png` | Artes da campanha: fundo da tela de mensagem, girassol, flor e o lockup de logos (`logos-white.png` na tela, `logos.png` é a variante escura, não usada hoje). |
+| `support.js` | Runtime do protótipo (dc-runtime). Compila o template e monta o componente. **Sem ele a página fica em branco.** |
+| `vendor/react*.js` | React 18.3.1 UMD, servido da mesma origem (ver abaixo). |
+| `assets/*.woff2` | Inter 300/400/500/600, subsetada, usada com o nome `InterW`. |
+| `assets/*.webp` | Artes da campanha. |
+| `assets-src/` | Os originais do bundle (PNG e TTF). Não são servidos na página; existem para dar de comer ao `tools/optimize.py`. |
+| `tools/optimize.py` | Gera `assets/` a partir de `assets-src/`. |
 | `.nojekyll` | Desliga o Jekyll no Pages — serve os arquivos como estão. |
 
-`index.html` é o export do protótipo sem alterações, exceto por três linhas
-somadas no `<head>`: `lang="pt-BR"`, `<title>` e `<meta name="description">`.
-Ao reexportar, vale repor essas três.
+## Peso da página
+
+A primeira versão publicada baixava **3,0 MB** e a arte grande (`flor.png`,
+1,4 MB sozinha) monopolizava a banda. Hoje a mesma página baixa **~570 KB**,
+sem mudar nada do visual:
+
+| | Antes | Depois |
+| --- | ---: | ---: |
+| Artes | 2,5 MB PNG | 275 KB WebP |
+| Fontes | 1,34 MB TTF | 86 KB WOFF2 subsetado |
+| React | unpkg, em série | mesma origem, em paralelo |
+| Requisições | 12 | 11 |
+
+O que foi feito:
+
+- **PNG → WebP** com qualidade 85 (`logos*` em lossless, que sai menor por ser
+  arte chapada). As dimensões não mudaram.
+- **TTF → WOFF2 subsetado**: Latin-1 + Latin Extended-A + pontuação + setas.
+  Latin inteiro entra de propósito, porque o campo de nome é digitado pelo
+  usuário e não dá para subsetar pelo texto fixo.
+- **`<link rel="preload">`** das fontes e do React, para saírem junto com o
+  `support.js` em vez de depois dele.
+- **React servido daqui**, via `window.__resources` — o gancho do próprio
+  dc-runtime para trocar a URL do CDN. Isso também desliga um refetch de
+  `location.href` que o runtime faz quando `__resources` não está definido, e
+  que só rebaixava o HTML inteiro sem serventia.
+- **`defer`** no `support.js`. O runtime já trata os dois casos (`readyState`
+  ou `DOMContentLoaded`), então é seguro.
+
+Os arquivos em `vendor/` foram conferidos contra os hashes SRI que o próprio
+`support.js` carrega para essas URLs.
+
+### Mexeu nas artes ou nas fontes?
+
+Ponha os originais em `assets-src/` e rode:
+
+```bash
+pip install Pillow "fonttools[woff]" brotli
+python tools/optimize.py
+```
 
 ## Rodar local
 
@@ -38,6 +78,17 @@ python -m http.server 8777
 
 Depois abra http://127.0.0.1:8777/. Abrir o `index.html` com `file://` não
 funciona — o runtime precisa de HTTP.
+
+## Se reexportar o protótipo
+
+O `index.html` é o export do dc, com estas mudanças por cima. Reexportando,
+é preciso repor:
+
+1. `lang="pt-BR"`, `<title>` e `<meta name="description">` no `<head>`
+2. o bloco de `<link rel="preload">` e o `window.__resources`
+3. `defer` no `<script src="./support.js">`
+4. as extensões: `.ttf` → `.woff2` e `.png` → `.webp` (nas tags `<img>` **e**
+   nas chamadas `load()` dentro do `saveImage`)
 
 ## Fora do repositório
 

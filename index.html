@@ -3,7 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="./support.js"></script>
+<link rel="preload" href="assets/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/Inter-Medium.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/Inter-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/Inter-Light.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="vendor/react.production.min.js" as="script">
+<link rel="preload" href="vendor/react-dom.production.min.js" as="script">
+<script>
+// O dc-runtime busca o React no unpkg, e so depois de ele proprio carregar.
+// window.__resources e o gancho dele para trocar a URL: servindo da mesma
+// origem, os dois baixam em paralelo com o support.js, sem DNS/TLS para
+// terceiro. De quebra, definir __resources desliga o refetch de location.href
+// que o runtime faz para atualizar o template (ver support.js, funcao boot) —
+// aqui isso so rebaixava o HTML inteiro de novo, sem serventia.
+window.__resources = {
+  "https://unpkg.com/react@18.3.1/umd/react.production.min.js": "vendor/react.production.min.js",
+  "https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js": "vendor/react-dom.production.min.js"
+};
+</script>
+<script defer src="./support.js"></script>
 <title>Setembro Amarelo · WAP</title>
 <meta name="description" content="Campanha Setembro Amarelo da WAP: escolha uma mensagem de cuidado, compartilhe e conheça boas práticas de bem-estar.">
 </head>
@@ -11,10 +29,10 @@
 <x-dc>
 <helmet data-dc-atomics="">
 <style>
-@font-face{font-family:"InterW";src:url("assets/Inter-Light.ttf") format("truetype");font-weight:300;font-display:swap}
-@font-face{font-family:"InterW";src:url("assets/Inter-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
-@font-face{font-family:"InterW";src:url("assets/Inter-Medium.ttf") format("truetype");font-weight:500;font-display:swap}
-@font-face{font-family:"InterW";src:url("assets/Inter-SemiBold.ttf") format("truetype");font-weight:600;font-display:swap}
+@font-face{font-family:"InterW";src:url("assets/Inter-Light.woff2") format("woff2");font-weight:300;font-display:swap}
+@font-face{font-family:"InterW";src:url("assets/Inter-Regular.woff2") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"InterW";src:url("assets/Inter-Medium.woff2") format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"InterW";src:url("assets/Inter-SemiBold.woff2") format("woff2");font-weight:600;font-display:swap}
 html,body{margin:0;padding:0;background:#f4f2e4}
 body{background:#f4f2e4;font-family:"InterW",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 a{color:#1d1d1b}a:hover{color:#8e7a12}
@@ -38,14 +56,14 @@ a{color:#1d1d1b}a:hover{color:#8e7a12}
 
 <div style="position:relative;min-height:100dvh;display:flex;flex-direction:column;overflow:hidden;background:#f4f2e4;color:#1d1d1b">
 
-  <img src="assets/bg-mensagem.png" alt="" style="position:fixed;inset:0;width:100%;height:100%;object-fit:cover;opacity:.95;pointer-events:none">
+  <img src="assets/bg-mensagem.webp" alt="" style="position:fixed;inset:0;width:100%;height:100%;object-fit:cover;opacity:.95;pointer-events:none">
 
   <sc-if value="{{ isMenu }}" hint-placeholder-val="{{ true }}">
   <div style="position:relative;z-index:1;flex:1;display:flex;flex-direction:column;min-height:100dvh;padding:max(6dvh,34px) clamp(18px,6vw,34px) 0 clamp(48px,13.5vw,58px);animation:sa-fade .45s ease both">
 
-    <img src="assets/girassol.png" alt="" style="position:absolute;right:-30%;bottom:-8%;width:min(134%,560px);height:auto;transform:rotate(-14deg);filter:drop-shadow(0 18px 26px rgba(29,29,27,.18));pointer-events:none;animation:sa-float-slow 17s ease-in-out infinite">
-    <img src="assets/flor.png" alt="" style="position: absolute; right: max(-8%,-56px); top: -6%; width: 259px; height: 276px; transform: rotate(16deg); filter: drop-shadow(0 12px 20px rgba(29,29,27,.16)); pointer-events: none;animation:sa-float 11s ease-in-out infinite"><img src="assets/flor.png" alt="" style="position: absolute; right: max(-8%,-56px); top: -6%; width: 259px; height: 276px; transform: rotate(16deg); filter: drop-shadow(0 12px 20px rgba(29,29,27,.16)); pointer-events: none;animation:sa-float 11s ease-in-out infinite"><img src="assets/flor.png" alt="" style="position: absolute; right: max(-8%,-56px); top: -6%; width: 259px; height: 276px; transform: rotate(16deg); filter: drop-shadow(0 12px 20px rgba(29,29,27,.16)); pointer-events: none;animation:sa-float 11s ease-in-out infinite"><img src="assets/flor.png" alt="" style="position: absolute; right: max(-8%,-56px); top: -6%; width: 259px; height: 276px; transform: rotate(16deg); filter: drop-shadow(0 12px 20px rgba(29,29,27,.16)); pointer-events: none;animation:sa-float 11s ease-in-out infinite">
-    <img src="assets/flor.png" alt="" style="position: absolute; left: -7px; top: 471px; width: 324px; height: 338px; transform: rotate(-24deg); opacity: .9; pointer-events: none;animation:sa-float 13s ease-in-out 1.5s infinite, sa-glow 13s ease-in-out 1.5s infinite"><img src="assets/flor.png" alt="" style="position: absolute; left: 964px; top: 725px; width: 324px; height: 338px; transform: rotate(-24deg); opacity: .9; pointer-events: none;animation:sa-float 13s ease-in-out 1.5s infinite, sa-glow 13s ease-in-out 1.5s infinite">
+    <img src="assets/girassol.webp" alt="" style="position:absolute;right:-30%;bottom:-8%;width:min(134%,560px);height:auto;transform:rotate(-14deg);filter:drop-shadow(0 18px 26px rgba(29,29,27,.18));pointer-events:none;animation:sa-float-slow 17s ease-in-out infinite">
+    <img src="assets/flor.webp" alt="" style="position: absolute; right: max(-8%,-56px); top: -6%; width: 259px; height: 276px; transform: rotate(16deg); filter: drop-shadow(0 12px 20px rgba(29,29,27,.16)); pointer-events: none;animation:sa-float 11s ease-in-out infinite"><img src="assets/flor.webp" alt="" style="position: absolute; right: max(-8%,-56px); top: -6%; width: 259px; height: 276px; transform: rotate(16deg); filter: drop-shadow(0 12px 20px rgba(29,29,27,.16)); pointer-events: none;animation:sa-float 11s ease-in-out infinite"><img src="assets/flor.webp" alt="" style="position: absolute; right: max(-8%,-56px); top: -6%; width: 259px; height: 276px; transform: rotate(16deg); filter: drop-shadow(0 12px 20px rgba(29,29,27,.16)); pointer-events: none;animation:sa-float 11s ease-in-out infinite"><img src="assets/flor.webp" alt="" style="position: absolute; right: max(-8%,-56px); top: -6%; width: 259px; height: 276px; transform: rotate(16deg); filter: drop-shadow(0 12px 20px rgba(29,29,27,.16)); pointer-events: none;animation:sa-float 11s ease-in-out infinite">
+    <img src="assets/flor.webp" alt="" style="position: absolute; left: -7px; top: 471px; width: 324px; height: 338px; transform: rotate(-24deg); opacity: .9; pointer-events: none;animation:sa-float 13s ease-in-out 1.5s infinite, sa-glow 13s ease-in-out 1.5s infinite"><img src="assets/flor.webp" alt="" style="position: absolute; left: 964px; top: 725px; width: 324px; height: 338px; transform: rotate(-24deg); opacity: .9; pointer-events: none;animation:sa-float 13s ease-in-out 1.5s infinite, sa-glow 13s ease-in-out 1.5s infinite">
 
     <div style="position:absolute;left:0;top:18%;width:66%;height:18%;background:#8e999a;opacity:.5;filter:blur(30px);pointer-events:none;animation:sa-breathe 17s ease-in-out infinite"></div>
 
@@ -96,7 +114,7 @@ a{color:#1d1d1b}a:hover{color:#8e7a12}
 
       <div style="display:flex;justify-content:center;margin:0 0 max(3dvh,20px);animation:sa-rise .6s .18s ease both">
         <span style="display:flex;justify-content:center;padding:13px 22px;border-radius:22px;background:rgba(29,29,27,.9)">
-          <img src="assets/logos-white.png" alt="Wap, WAAW by Alok e freso" style="width:min(200px,58vw);height:auto;display:block">
+          <img src="assets/logos-white.webp" alt="Wap, WAAW by Alok e freso" style="width:min(200px,58vw);height:auto;display:block">
         </span>
       </div>
     </div>
@@ -106,9 +124,9 @@ a{color:#1d1d1b}a:hover{color:#8e7a12}
   <sc-if value="{{ isMessage }}" hint-placeholder-val="{{ false }}">
   <div style="position:relative;z-index:1;flex:1;display:flex;flex-direction:column;min-height:100dvh;padding:max(6dvh,34px) clamp(16px,4.5vw,28px) max(4dvh,26px);animation:sa-fade .4s ease both">
 
-    <img src="assets/girassol.png" alt="" style="position:absolute;right:-26%;bottom:-6%;width:min(119%,500px);height:auto;transform:rotate(8deg);filter:drop-shadow(0 16px 24px rgba(29,29,27,.16));pointer-events:none;animation:sa-float-slow 18s ease-in-out infinite">
-    <img src="assets/flor.png" alt="" style="position:absolute;right:max(-8%,-52px);top:-5%;width:min(40%,170px);height:auto;transform:rotate(18deg);filter:drop-shadow(0 12px 20px rgba(29,29,27,.16));pointer-events:none;animation:sa-float 12s ease-in-out infinite">
-    <img src="assets/flor.png" alt="" style="position:absolute;left:min(-4%,-40px);bottom:22%;width:min(24%,104px);height:auto;transform:rotate(-28deg);opacity:.9;pointer-events:none;animation:sa-float 14s ease-in-out 2s infinite">
+    <img src="assets/girassol.webp" alt="" style="position:absolute;right:-26%;bottom:-6%;width:min(119%,500px);height:auto;transform:rotate(8deg);filter:drop-shadow(0 16px 24px rgba(29,29,27,.16));pointer-events:none;animation:sa-float-slow 18s ease-in-out infinite">
+    <img src="assets/flor.webp" alt="" style="position:absolute;right:max(-8%,-52px);top:-5%;width:min(40%,170px);height:auto;transform:rotate(18deg);filter:drop-shadow(0 12px 20px rgba(29,29,27,.16));pointer-events:none;animation:sa-float 12s ease-in-out infinite">
+    <img src="assets/flor.webp" alt="" style="position:absolute;left:min(-4%,-40px);bottom:22%;width:min(24%,104px);height:auto;transform:rotate(-28deg);opacity:.9;pointer-events:none;animation:sa-float 14s ease-in-out 2s infinite">
 
     <div style="position:relative;width:100%;max-width:520px;margin:0 auto;display:flex;flex-direction:column;flex:1">
 
@@ -161,7 +179,7 @@ a{color:#1d1d1b}a:hover{color:#8e7a12}
 
     <div style="margin-top:clamp(18px,2.6dvh,28px);display:flex;justify-content:center;animation:sa-rise .6s .2s ease both">
       <span style="display:flex;justify-content:center;padding:13px 22px;border-radius:22px;background:rgba(29,29,27,.9)">
-        <img src="assets/logos-white.png" alt="Wap, WAAW by Alok e freso" style="width:min(200px,58vw);height:auto;display:block">
+        <img src="assets/logos-white.webp" alt="Wap, WAAW by Alok e freso" style="width:min(200px,58vw);height:auto;display:block">
       </span>
     </div>
     </div>
@@ -173,8 +191,8 @@ a{color:#1d1d1b}a:hover{color:#8e7a12}
 
     <div style="position:absolute;left:0;top:18%;width:66%;height:18%;background:#8e999a;opacity:.5;filter:blur(30px);pointer-events:none;animation:sa-breathe 17s ease-in-out infinite;animation:sa-breathe 16s ease-in-out infinite"></div>
 
-    <img src="assets/girassol.png" alt="" style="position:absolute;right:-32%;bottom:-8%;width:min(96%,420px);height:auto;transform:rotate(-6deg);filter:drop-shadow(0 16px 24px rgba(29,29,27,.16));pointer-events:none;animation:sa-float-slow 19s ease-in-out infinite">
-    <img src="assets/flor.png" alt="" style="position:absolute;right:max(-8%,-50px);top:-4%;width:min(38%,160px);height:auto;transform:rotate(14deg);filter:drop-shadow(0 12px 20px rgba(29,29,27,.16));pointer-events:none;animation:sa-float 12s ease-in-out infinite">
+    <img src="assets/girassol.webp" alt="" style="position:absolute;right:-32%;bottom:-8%;width:min(96%,420px);height:auto;transform:rotate(-6deg);filter:drop-shadow(0 16px 24px rgba(29,29,27,.16));pointer-events:none;animation:sa-float-slow 19s ease-in-out infinite">
+    <img src="assets/flor.webp" alt="" style="position:absolute;right:max(-8%,-50px);top:-4%;width:min(38%,160px);height:auto;transform:rotate(14deg);filter:drop-shadow(0 12px 20px rgba(29,29,27,.16));pointer-events:none;animation:sa-float 12s ease-in-out infinite">
 
     <div style="position:relative;width:100%;max-width:520px;margin:0 auto;display:flex;flex-direction:column;flex:1">
 
@@ -199,7 +217,7 @@ a{color:#1d1d1b}a:hover{color:#8e7a12}
 
       <div style="margin-top:auto;padding-top:clamp(18px,2.6dvh,28px);display:flex;justify-content:center;animation:sa-rise .6s .2s ease both">
         <span style="display:flex;justify-content:center;padding:13px 22px;border-radius:22px;background:rgba(29,29,27,.9)">
-          <img src="assets/logos-white.png" alt="Wap, WAAW by Alok e freso" style="width:min(200px,58vw);height:auto;display:block">
+          <img src="assets/logos-white.webp" alt="Wap, WAAW by Alok e freso" style="width:min(200px,58vw);height:auto;display:block">
         </span>
       </div>
     </div>
@@ -339,8 +357,8 @@ class Component extends DCLogic {
     const c = cv.getContext("2d");
     const load = (src) => new Promise((res) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
     const [bg, flor, bloom, logo] = await Promise.all([
-      load("assets/bg-mensagem.png"), load("assets/girassol.png"),
-      load("assets/flor.png"), load("assets/logos-white.png")
+      load("assets/bg-mensagem.webp"), load("assets/girassol.webp"),
+      load("assets/flor.webp"), load("assets/logos-white.webp")
     ]);
     try { await document.fonts.load('400 40px "InterW"'); await document.fonts.ready; } catch (e) {}
 
