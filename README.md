@@ -7,14 +7,71 @@ ao Zenklub.
 
 No ar em: **https://wap-people.github.io/setembro-amarelo/**
 
-## Como publicar no GitHub Pages
+## Quem publica
 
-1. `Settings` → `Pages`
-2. **Source**: `Deploy from a branch`
-3. **Branch**: `main`, pasta `/ (root)` → `Save`
+O Pages está em **Deploy from a branch** → `main`, pasta `/ (root)`. Não há
+build nem GitHub Actions: **um push na `main` republica o site sozinho em ~1
+minuto**. Na prática, quem tem permissão de escrita no repositório publica.
 
-Não é preciso build: é HTML estático puro. Um push na `main` republica sozinho
-em ~1 minuto.
+| Permissão | Dá para |
+| --- | --- |
+| **Write** | Editar, commitar, dar push — ou seja, publicar. Cobre o dia a dia. |
+| **Admin** | Tudo acima, mais `Settings` (inclusive religar o Pages se alguém desligar) e dar acesso a outras pessoas. |
+
+Convém mais de uma pessoa com **Admin**. Com Write, a campanha continua no ar
+e atualizável, mas qualquer coisa em `Settings` volta a depender de uma pessoa
+só — que é justamente o que se quer evitar numa campanha com data marcada.
+
+Acesso se dá em `Settings` → `Collaborators and teams`. Numa org, preferir um
+**time** a colaborador avulso: entra e sai gente pelo time, e o desligamento
+de alguém não deixa acesso solto para trás.
+
+## Primeira vez na máquina
+
+```bash
+git clone https://github.com/wap-people/setembro-amarelo.git
+cd setembro-amarelo
+pip install Pillow "fonttools[woff]" brotli   # só para os scripts de tools/
+```
+
+Para ver rodando local:
+
+```bash
+python -m http.server 8777
+```
+
+e abrir http://127.0.0.1:8777/. **Abrir o `index.html` com duplo clique não
+funciona** — o runtime precisa de HTTP, pelo `file://` a página fica em branco.
+
+## O ciclo completo, do export ao ar
+
+1. Exportar o protótipo do dc (vem um `.zip`).
+2. Conferir se as artes mudaram: comparar o `assets/` do zip com o
+   `assets-src/` daqui. Nas duas últimas vezes só o HTML tinha mudado.
+3. Se mudaram, substituir os originais em `assets-src/`.
+4. ```bash
+   python tools/apply-export.py "caminho/Setembro Amarelo.dc.html"
+   python tools/optimize.py
+   ```
+5. Testar local (ver o checklist abaixo).
+6. `git add -A && git commit && git push` — pronto, está no ar.
+7. Abrir https://wap-people.github.io/setembro-amarelo/ com `?x=1` no fim da
+   URL, para furar cache, e conferir.
+
+### Checklist antes do push
+
+- As três telas: menu, mensagem, boas práticas.
+- O sheet "Enviar para alguém", e o **Salvar imagem** de fato gerando o PNG —
+  é o caminho mais frágil, porque desenha as artes num canvas.
+- Larguras 320, 375 e 430 px, sem barra de rolagem horizontal.
+- Console sem 404. Se aparecer `.ttf` ou `.png` sendo pedido, o
+  `apply-export.py` não rodou.
+
+### Se a página abrir em branco
+
+Quase sempre é o `support.js`: sem ele nada renderiza e **não aparece erro na
+tela**, só no console. Conferir se o arquivo está na raiz e se o `<head>` do
+`index.html` ainda o carrega.
 
 ## Estrutura
 
@@ -68,34 +125,17 @@ Os scripts de `tools/` precisam de:
 pip install Pillow "fonttools[woff]" brotli
 ```
 
-## Rodar local
+## Por que os scripts existem
 
-```bash
-python -m http.server 8777
-```
+O export do dc sempre volta pedindo `.ttf` e `.png` e buscando o React no
+unpkg — ou seja, desfazendo a otimização a cada reexportação. Em vez de
+repor as quatro mudanças na mão toda vez, o `tools/apply-export.py` reaplica
+todas por cima do export cru, e o `tools/optimize.py` regenera `assets/`.
 
-Depois abra http://127.0.0.1:8777/. Abrir o `index.html` com `file://` não
-funciona — o runtime precisa de HTTP.
-
-## Se reexportar o protótipo
-
-O `index.html` é o export do dc com quatro coisas por cima (preload, React
-local, `defer`, e as extensões `.woff2`/`.webp`). Reexportando, não reponha na
-mão — aponte o script para o export novo:
-
-```bash
-python tools/apply-export.py "caminho/Setembro Amarelo.dc.html"
-python tools/optimize.py
-```
-
-O primeiro reescreve o `index.html`; o segundo regenera `assets/` a partir de
-`assets-src/`. Os dois são idempotentes e o `apply-export.py` aborta se sobrar
-alguma referência a `.ttf`, `.png` ou ao unpkg — se o formato do export mudar
-a ponto de ele não achar onde encaixar, ele avisa em vez de gerar uma página
-quebrada.
-
-Se as artes ou as fontes também mudarem, troque os arquivos em `assets-src/`
-antes de rodar o `optimize.py`.
+Os dois são idempotentes: rodar de novo não estraga nada. E o
+`apply-export.py` **aborta** se sobrar referência a `.ttf`, `.png` ou ao
+unpkg — se o formato do export mudar a ponto de ele não achar onde encaixar,
+ele avisa em vez de gerar uma página quebrada e silenciosamente pesada.
 
 ## Fora do repositório
 
