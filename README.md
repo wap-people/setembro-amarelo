@@ -25,7 +25,8 @@ em ~1 minuto.
 | `vendor/react*.js` | React 18.3.1 UMD, servido da mesma origem (ver abaixo). |
 | `assets/*.woff2` | Inter 300/400/500/600, subsetada, usada com o nome `InterW`. |
 | `assets/*.webp` | Artes da campanha. |
-| `assets-src/` | Os originais do bundle (PNG e TTF). Não são servidos na página; existem para dar de comer ao `tools/optimize.py`. |
+| `assets-src/` | O bundle cru: o export `.dc.html` como saiu do dc, e as artes/fontes em PNG e TTF. Nada aqui é servido na página — é a entrada dos scripts de `tools/`, e o que permite diferenciar um export novo do anterior. **Não edite o `.dc.html` daqui esperando ver mudança no site**; quem vai pro ar é o `index.html` da raiz. |
+| `tools/apply-export.py` | Reaplica as mudanças da publicação sobre um export novo do dc. |
 | `tools/optimize.py` | Gera `assets/` a partir de `assets-src/`. |
 | `.nojekyll` | Desliga o Jekyll no Pages — serve os arquivos como estão. |
 
@@ -61,13 +62,10 @@ O que foi feito:
 Os arquivos em `vendor/` foram conferidos contra os hashes SRI que o próprio
 `support.js` carrega para essas URLs.
 
-### Mexeu nas artes ou nas fontes?
-
-Ponha os originais em `assets-src/` e rode:
+Os scripts de `tools/` precisam de:
 
 ```bash
 pip install Pillow "fonttools[woff]" brotli
-python tools/optimize.py
 ```
 
 ## Rodar local
@@ -81,14 +79,23 @@ funciona — o runtime precisa de HTTP.
 
 ## Se reexportar o protótipo
 
-O `index.html` é o export do dc, com estas mudanças por cima. Reexportando,
-é preciso repor:
+O `index.html` é o export do dc com quatro coisas por cima (preload, React
+local, `defer`, e as extensões `.woff2`/`.webp`). Reexportando, não reponha na
+mão — aponte o script para o export novo:
 
-1. `lang="pt-BR"`, `<title>` e `<meta name="description">` no `<head>`
-2. o bloco de `<link rel="preload">` e o `window.__resources`
-3. `defer` no `<script src="./support.js">`
-4. as extensões: `.ttf` → `.woff2` e `.png` → `.webp` (nas tags `<img>` **e**
-   nas chamadas `load()` dentro do `saveImage`)
+```bash
+python tools/apply-export.py "caminho/Setembro Amarelo.dc.html"
+python tools/optimize.py
+```
+
+O primeiro reescreve o `index.html`; o segundo regenera `assets/` a partir de
+`assets-src/`. Os dois são idempotentes e o `apply-export.py` aborta se sobrar
+alguma referência a `.ttf`, `.png` ou ao unpkg — se o formato do export mudar
+a ponto de ele não achar onde encaixar, ele avisa em vez de gerar uma página
+quebrada.
+
+Se as artes ou as fontes também mudarem, troque os arquivos em `assets-src/`
+antes de rodar o `optimize.py`.
 
 ## Fora do repositório
 
